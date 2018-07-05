@@ -1,0 +1,30 @@
+image: node:8-alpine
+
+stages:
+    - tests
+    - publish
+
+before_script:
+    - echo $NPMRC_REGISTRY_KEY > $CI_PROJECT_DIR/.npmrc
+    - yarn
+
+tests:
+    stage: tests
+    script:
+        - yarn run test
+    tags:
+        - PMD
+        - STG
+        - ci
+
+publish:
+    stage: publish
+    only:
+        - master
+    script:
+        - yarn run build
+        - npm publish
+    tags:
+        - PMD
+        - STG
+        - ci

@@ -1,0 +1,40 @@
+{
+  "name": "@prismamedia/ts-module-loader",
+  "license": "UNLICENSED",
+  "author": "Yvann Boucher <y.bouche@prismamedia.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/prismamediadigital/one/ts-module-loader"
+  },
+  "version": "1.0.0",
+  "main": "dist/lib/index.js",
+  "typings": "dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "test": "./node_modules/.bin/jest --verbose",
+    "test-watch": "npm run test -- --watchAll",
+    "build": "./node_modules/.bin/tsc",
+    "prettier": "./node_modules/.bin/prettier --write \"**/*.ts\""
+  },
+  "dependencies": {
+    "@types/node": "^10.5.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^23.1.4",
+    "jest": "^23.2.0",
+    "prettier": "^1.13.7",
+    "ts-jest": "^23.0.0",
+    "ts-node": "^7.0.0",
+    "typescript": "^2.7.1"
+  },
+  "prettier": {
+    "semi": true,
+    "trailingComma": "all",
+    "singleQuote": true,
+    "printWidth": 120,
+    "tabWidth": 2,
+    "useTabs": false
+  }
+}

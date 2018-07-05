@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  lib:
+    image: node:8-alpine
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app:cached
+    logging:
+      options:
+        max-size: 50k
+        max-file: "1"
+    restart: always
