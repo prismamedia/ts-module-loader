@@ -7,20 +7,23 @@ export interface ModuleMap<T> {
 
 export interface Config {
   directory: string;
-  fileBaseNameRegex?: RegExp;
+  include?: RegExp;
+  exclude?: RegExp;
   strict?: boolean;
 }
 
 const moduleLoader = <T = any>(directoryOrConfig: string | Config): ModuleMap<T> => {
-  let directory: string;
-  let fileBaseNameRegex: RegExp = /^[_a-zA-Z][_a-zA-Z0-9]*$/;
-  let strict: boolean = true;
+  let directory: Config['directory'];
+  let include: NonNullable<Config['include']> | null = null;
+  let exclude: NonNullable<Config['exclude']> | null = null;
+  let strict: NonNullable<Config['strict']> = true;
 
   if (typeof directoryOrConfig === 'string') {
     directory = directoryOrConfig;
   } else {
     directory = directoryOrConfig.directory;
-    fileBaseNameRegex = directoryOrConfig.fileBaseNameRegex || fileBaseNameRegex;
+    include = typeof directoryOrConfig.include !== 'undefined' ? directoryOrConfig.include : include;
+    exclude = typeof directoryOrConfig.exclude !== 'undefined' ? directoryOrConfig.exclude : exclude;
     strict = typeof directoryOrConfig.strict !== 'undefined' ? directoryOrConfig.strict : strict;
   }
 
@@ -29,7 +32,7 @@ const moduleLoader = <T = any>(directoryOrConfig: string | Config): ModuleMap<T>
     if (fileExtension && ['.js', '.ts', '.json'].includes(fileExtension)) {
       const fileBaseName = path.basename(file, fileExtension);
 
-      if (fileBaseNameRegex.test(fileBaseName)) {
+      if ((!include || include.test(fileBaseName)) && !(exclude && exclude.test(fileBaseName))) {
         Object.assign(moduleMap, {
           [fileBaseName]: require(path.join(directory, file)).default,
         });
