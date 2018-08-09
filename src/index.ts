@@ -1,5 +1,6 @@
-import fs from 'fs';
-import path from 'path';
+import * as fs from 'fs';
+import * as path from 'path';
+import 'core-js/library/es7';
 
 export interface ModuleMap<T> {
   [moduleName: string]: T;
