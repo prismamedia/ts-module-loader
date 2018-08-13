@@ -17,13 +17,10 @@
     "build": "./node_modules/.bin/tsc -p ./tsconfig.prod.json",
     "prettier": "./node_modules/.bin/prettier --write \"**/*.ts\""
   },
-  "dependencies": {
-    "@types/node": "^10.5.2",
-    "core-js": "*"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@types/core-js": "*",
-    "@types/jest": "^23.1.6",
+    "@types/jest": "*",
+    "@types/node": "*",
     "jest": "^23.4.1",
     "prettier": "^1.13.7",
     "ts-jest": "^23.0.0",

@@ -1,10 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import 'core-js/library/es7';
 
-export interface ModuleMap<T> {
-  [moduleName: string]: T;
-}
+export type ModuleMap<T> = Record<string, T>;
 
 export interface Config {
   directory: string;
