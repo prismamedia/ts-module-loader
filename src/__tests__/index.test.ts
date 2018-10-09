@@ -46,4 +46,12 @@ describe('ModuleLoader', () => {
       }),
     ).toThrowError('The module "0second.ts" has not a valid name.');
   });
+
+  it('loads modules from missing directory', () => {
+    expect(
+      moduleLoader({
+        directory: `${__dirname}/missing_modules`,
+      }),
+    ).toEqual({});
+  });
 });

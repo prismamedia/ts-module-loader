@@ -7,6 +7,7 @@ export interface Config {
   directory: string;
   include?: RegExp;
   exclude?: RegExp;
+  /** Either throw an error on invalid name or not */
   strict?: boolean;
 }
 
@@ -27,27 +28,35 @@ const moduleLoader = <T = any, K extends string | number | symbol = string, TMod
     strict = typeof directoryOrConfig.strict !== 'undefined' ? directoryOrConfig.strict : strict;
   }
 
-  return fs.readdirSync(directory).reduce(
-    (moduleMap: TModuleMap, file): TModuleMap => {
-      const fileExtension = path.extname(file);
-      if (fileExtension && ['.js', '.ts', '.json'].includes(fileExtension)) {
-        const fileBaseName = path.basename(file, fileExtension);
+  const moduleMap: TModuleMap = {} as TModuleMap;
 
-        if ((!include || include.test(fileBaseName)) && !(exclude && exclude.test(fileBaseName))) {
-          Object.assign(moduleMap, {
-            [fileBaseName]: require(path.join(directory, file)).default,
-          });
-        } else {
-          if (strict) {
-            throw new Error(`The module "${file}" has not a valid name.`);
+  let isDirectory: boolean;
+  try {
+    isDirectory = fs.statSync(directory).isDirectory();
+  } catch (err) {
+    isDirectory = false;
+  }
+
+  return isDirectory
+    ? fs.readdirSync(directory).reduce((moduleMap: TModuleMap, file): TModuleMap => {
+        const fileExtension = path.extname(file);
+        if (fileExtension && ['.js', '.ts', '.json'].includes(fileExtension)) {
+          const fileBaseName = path.basename(file, fileExtension);
+
+          if ((!include || include.test(fileBaseName)) && !(exclude && exclude.test(fileBaseName))) {
+            Object.assign(moduleMap, {
+              [fileBaseName]: require(path.join(directory, file)).default,
+            });
+          } else {
+            if (strict) {
+              throw new Error(`The module "${file}" has not a valid name.`);
+            }
           }
         }
-      }
 
-      return moduleMap;
-    },
-    {} as TModuleMap,
-  );
+        return moduleMap;
+      }, moduleMap)
+    : moduleMap;
 };
 
 export default moduleLoader;
