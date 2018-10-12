@@ -48,6 +48,22 @@ describe('ModuleLoader', () => {
       }),
     ).rejects.toMatchObject({ message: 'The module "0second.ts" has not a valid name.' }));
 
+  it('loads modules without default export, not strict', async () =>
+    expect(
+      moduleLoader({
+        directory: `${__dirname}/module-without-default-export`,
+        strict: false,
+      }),
+    ).resolves.toEqual({}));
+
+  it('loads modules without default export, strict', async () =>
+    expect(
+      moduleLoader({
+        directory: `${__dirname}/module-without-default-export`,
+        strict: true,
+      }),
+    ).rejects.toMatchObject({ message: 'The module "first.ts" has not a default export.' }));
+
   it('loads modules from missing directory', async () =>
     expect(
       moduleLoader({

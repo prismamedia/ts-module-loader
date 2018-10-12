@@ -51,9 +51,14 @@ async function moduleLoader<T = any, K extends string | number | symbol = string
             const fileBaseName = path.basename(file, fileExtension);
 
             if ((!include || include.test(fileBaseName)) && !(exclude && exclude.test(fileBaseName))) {
-              Object.assign(moduleMap, {
-                [fileBaseName]: (await import(path.join(directory, file))).default,
-              });
+              const module = await import(path.join(directory, file));
+              if (typeof module.default !== 'undefined') {
+                Object.assign(moduleMap, { [fileBaseName]: module.default });
+              } else {
+                if (strict) {
+                  throw new Error(`The module "${file}" has not a default export.`);
+                }
+              }
             } else {
               if (strict) {
                 throw new Error(`The module "${file}" has not a valid name.`);
