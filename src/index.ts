@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { promisify } from 'util';
 
 export type ModuleMap<T, K extends string | number | symbol = string> = Record<K, T>;
 
@@ -11,9 +12,12 @@ export interface Config {
   strict?: boolean;
 }
 
-const moduleLoader = <T = any, K extends string | number | symbol = string, TModuleMap = ModuleMap<T, K>>(
+const fsStat = promisify(fs.stat);
+const fsReaddir = promisify(fs.readdir);
+
+async function moduleLoader<T = any, K extends string | number | symbol = string, TModuleMap = ModuleMap<T, K>>(
   directoryOrConfig: string | Config,
-): TModuleMap => {
+): Promise<TModuleMap> {
   let directory: Config['directory'];
   let include: NonNullable<Config['include']> | null = null;
   let exclude: NonNullable<Config['exclude']> | null = null;
@@ -32,31 +36,36 @@ const moduleLoader = <T = any, K extends string | number | symbol = string, TMod
 
   let isDirectory: boolean;
   try {
-    isDirectory = fs.statSync(directory).isDirectory();
+    isDirectory = (await fsStat(directory)).isDirectory();
   } catch (err) {
     isDirectory = false;
   }
 
-  return isDirectory
-    ? fs.readdirSync(directory).reduce((moduleMap: TModuleMap, file): TModuleMap => {
-        const fileExtension = path.extname(file);
-        if (fileExtension && ['.js', '.ts', '.json'].includes(fileExtension)) {
-          const fileBaseName = path.basename(file, fileExtension);
+  if (isDirectory) {
+    const files = await fsReaddir(directory);
+    if (files.length > 0) {
+      await Promise.all(
+        files.map(async file => {
+          const fileExtension = path.extname(file);
+          if (fileExtension && ['.js', '.jsx', '.ts', '.tsx', '.json'].includes(fileExtension)) {
+            const fileBaseName = path.basename(file, fileExtension);
 
-          if ((!include || include.test(fileBaseName)) && !(exclude && exclude.test(fileBaseName))) {
-            Object.assign(moduleMap, {
-              [fileBaseName]: require(path.join(directory, file)).default,
-            });
-          } else {
-            if (strict) {
-              throw new Error(`The module "${file}" has not a valid name.`);
+            if ((!include || include.test(fileBaseName)) && !(exclude && exclude.test(fileBaseName))) {
+              Object.assign(moduleMap, {
+                [fileBaseName]: (await import(path.join(directory, file))).default,
+              });
+            } else {
+              if (strict) {
+                throw new Error(`The module "${file}" has not a valid name.`);
+              }
             }
           }
-        }
+        }),
+      );
+    }
+  }
 
-        return moduleMap;
-      }, moduleMap)
-    : moduleMap;
-};
+  return moduleMap;
+}
 
 export default moduleLoader;

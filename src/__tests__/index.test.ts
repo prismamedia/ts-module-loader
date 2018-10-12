@@ -1,57 +1,57 @@
 import moduleLoader from '../';
 
 describe('ModuleLoader', () => {
-  it('loads modules map from string', () => {
-    const moduleMap = moduleLoader(`${__dirname}/modules`);
+  it('loads modules map from string', async () =>
+    expect(moduleLoader(`${__dirname}/modules`)).resolves.toEqual({
+      '0second': expect.anything(),
+      first: expect.anything(),
+      second: expect.anything(),
+    }));
 
-    expect(Object.keys(moduleMap)).toHaveLength(3);
-    expect(Object.keys(moduleMap)).toEqual(['0second', 'first', 'second']);
-  });
+  it('loads modules map from object', async () =>
+    expect(moduleLoader({ directory: `${__dirname}/modules` })).resolves.toEqual({
+      '0second': expect.anything(),
+      first: expect.anything(),
+      second: expect.anything(),
+    }));
 
-  it('loads modules map from object', () => {
-    const moduleMap = moduleLoader({ directory: `${__dirname}/modules` });
+  it('loads modules map from object, with include regexp, not strict', async () =>
+    expect(
+      moduleLoader({
+        directory: `${__dirname}/modules`,
+        include: /^[a-zA-Z][_a-zA-Z0-9]*$/,
+        strict: false,
+      }),
+    ).resolves.toEqual({
+      first: expect.anything(),
+      second: expect.anything(),
+    }));
 
-    expect(Object.keys(moduleMap)).toHaveLength(3);
-    expect(Object.keys(moduleMap)).toEqual(['0second', 'first', 'second']);
-  });
+  it('loads modules map from object, with exclude regexp, not strict', async () =>
+    expect(
+      moduleLoader({
+        directory: `${__dirname}/modules`,
+        exclude: /^second$/,
+        strict: false,
+      }),
+    ).resolves.toEqual({
+      '0second': expect.anything(),
+      first: expect.anything(),
+    }));
 
-  it('loads modules map from object, with include regexp, not strict', () => {
-    const moduleMap = moduleLoader({
-      directory: `${__dirname}/modules`,
-      include: /^[a-zA-Z][_a-zA-Z0-9]*$/,
-      strict: false,
-    });
-
-    expect(Object.keys(moduleMap)).toHaveLength(2);
-    expect(Object.keys(moduleMap)).toEqual(['first', 'second']);
-  });
-
-  it('loads modules map from object, with exclude regexp, not strict', () => {
-    const moduleMap = moduleLoader({
-      directory: `${__dirname}/modules`,
-      exclude: /^second$/,
-      strict: false,
-    });
-
-    expect(Object.keys(moduleMap)).toHaveLength(2);
-    expect(Object.keys(moduleMap)).toEqual(['0second', 'first']);
-  });
-
-  it('loads modules map from object, with include regexp, strict', () => {
-    expect(() =>
+  it('loads modules map from object, with include regexp, strict', async () =>
+    expect(
       moduleLoader({
         directory: `${__dirname}/modules`,
         include: /^[a-zA-Z][_a-zA-Z0-9]*$/,
         strict: true,
       }),
-    ).toThrowError('The module "0second.ts" has not a valid name.');
-  });
+    ).rejects.toMatchObject({ message: 'The module "0second.ts" has not a valid name.' }));
 
-  it('loads modules from missing directory', () => {
+  it('loads modules from missing directory', async () =>
     expect(
       moduleLoader({
         directory: `${__dirname}/missing_modules`,
       }),
-    ).toEqual({});
-  });
+    ).resolves.toEqual({}));
 });
