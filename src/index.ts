@@ -2,10 +2,11 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { promisify } from 'util';
 
-export type ModuleMap<T, K extends string | number | symbol = string> = Record<K, T>;
+export type ModuleMap<T, K extends string = string> = Record<K, T>;
 
 export interface Config {
   directory: string;
+  exportName?: string;
   include?: RegExp;
   exclude?: RegExp;
   /** Either throw an error on invalid name or not */
@@ -15,10 +16,11 @@ export interface Config {
 const fsStat = promisify(fs.stat);
 const fsReaddir = promisify(fs.readdir);
 
-async function moduleLoader<T = any, K extends string | number | symbol = string, TModuleMap = ModuleMap<T, K>>(
+async function moduleLoader<T = any, K extends string = any, TModuleMap = ModuleMap<T, K>>(
   directoryOrConfig: string | Config,
 ): Promise<TModuleMap> {
   let directory: Config['directory'];
+  let exportName: string = 'default';
   let include: NonNullable<Config['include']> | null = null;
   let exclude: NonNullable<Config['exclude']> | null = null;
   let strict: NonNullable<Config['strict']> = true;
@@ -27,12 +29,13 @@ async function moduleLoader<T = any, K extends string | number | symbol = string
     directory = directoryOrConfig;
   } else {
     directory = directoryOrConfig.directory;
+    exportName = typeof directoryOrConfig.exportName !== 'undefined' ? directoryOrConfig.exportName : exportName;
     include = typeof directoryOrConfig.include !== 'undefined' ? directoryOrConfig.include : include;
     exclude = typeof directoryOrConfig.exclude !== 'undefined' ? directoryOrConfig.exclude : exclude;
     strict = typeof directoryOrConfig.strict !== 'undefined' ? directoryOrConfig.strict : strict;
   }
 
-  const moduleMap: TModuleMap = {} as TModuleMap;
+  const moduleMap: TModuleMap = Object.create(null);
 
   let isDirectory: boolean;
   try {
@@ -52,8 +55,8 @@ async function moduleLoader<T = any, K extends string | number | symbol = string
 
             if ((!include || include.test(fileBaseName)) && !(exclude && exclude.test(fileBaseName))) {
               const module = await import(path.join(directory, file));
-              if (typeof module.default !== 'undefined') {
-                Object.assign(moduleMap, { [fileBaseName]: module.default });
+              if (typeof module[exportName] !== 'undefined') {
+                Object.assign(moduleMap, { [fileBaseName]: module[exportName] });
               } else {
                 if (strict) {
                   throw new Error(`The module "${file}" has not a default export.`);

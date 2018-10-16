@@ -70,4 +70,15 @@ describe('ModuleLoader', () => {
         directory: `${__dirname}/missing_modules`,
       }),
     ).resolves.toEqual({}));
+
+  it('loads modules with named export, not strict', async () =>
+    expect(
+      moduleLoader({
+        directory: `${__dirname}/module-with-named-export`,
+        exportName: 'test',
+        strict: false,
+      }),
+    ).resolves.toEqual({
+      first: expect.anything(),
+    }));
 });
