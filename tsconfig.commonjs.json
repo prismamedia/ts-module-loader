@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig",
+  "exclude": ["src/**/__tests__", "src/**/*.test.ts"],
+  "compilerOptions": {
+    "module": "commonjs",
+    "outDir": "dist/commonjs",
+    "declarationDir": "dist/types"
+  }
+}

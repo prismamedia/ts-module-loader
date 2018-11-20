@@ -46,7 +46,7 @@ describe('ModuleLoader', () => {
         include: /^[a-zA-Z][_a-zA-Z0-9]*$/,
         strict: true,
       }),
-    ).rejects.toMatchObject({ message: 'The module "0second.ts" has not a valid name.' }));
+    ).rejects.toMatchObject({ message: 'The module "0second.ts" does not have a valid name.' }));
 
   it('loads modules without default export, not strict', async () =>
     expect(
@@ -62,7 +62,7 @@ describe('ModuleLoader', () => {
         directory: `${__dirname}/module-without-default-export`,
         strict: true,
       }),
-    ).rejects.toMatchObject({ message: 'The module "first.ts" has not a default export.' }));
+    ).rejects.toMatchObject({ message: 'The module "first.ts" does not have a default export.' }));
 
   it('loads modules from missing directory', async () =>
     expect(

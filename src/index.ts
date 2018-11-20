@@ -9,7 +9,7 @@ export interface Config {
   exportName?: string;
   include?: RegExp;
   exclude?: RegExp;
-  /** Either throw an error on invalid name or not */
+  /** Either throw an error on invalid name and missing export or not */
   strict?: boolean;
 }
 
@@ -59,12 +59,16 @@ async function moduleLoader<T = any, K extends string = any, TModuleMap = Module
                 Object.assign(moduleMap, { [fileBaseName]: module[exportName] });
               } else {
                 if (strict) {
-                  throw new Error(`The module "${file}" has not a default export.`);
+                  throw new Error(
+                    `The module "${file}" does not have a ${
+                      exportName === 'default' ? 'default export' : `export named "${exportName}"`
+                    }.`,
+                  );
                 }
               }
             } else {
               if (strict) {
-                throw new Error(`The module "${file}" has not a valid name.`);
+                throw new Error(`The module "${file}" does not have a valid name.`);
               }
             }
           }

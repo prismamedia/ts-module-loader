@@ -1,15 +1,16 @@
 {
+  "include": ["src/**/*"],
   "compilerOptions": {
+    "rootDir": "src",
     "moduleResolution": "node",
-    "module": "commonjs",
-    // Node >=8.9
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
     "target": "es2017",
-    "lib": ["es2016", "es2017.intl", "es2017.object", "es2017.string", "es2017.typedarrays"],
+    "lib": ["es2017", "esnext.asynciterable"],
     "strict": true,
     "sourceMap": true,
+    "composite": true,
     "declaration": true,
-    "declarationDir": "dist/types",
-    "outDir": "dist/lib"
-  },
-  "include": ["src/**/*.ts"]
+    "declarationMap": true
+  }
 }

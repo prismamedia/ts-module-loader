@@ -6,52 +6,26 @@
     "type": "git",
     "url": "https://gitlab.com/prismamediadigital/one/ts-module-loader"
   },
-  "main": "dist/lib/index.js",
+  "main": "dist/commonjs/index.js",
+  "module": "dist/module/index.js",
   "typings": "dist/types/index.d.ts",
-  "files": [
-    "dist"
-  ],
   "scripts": {
-    "test": "./node_modules/.bin/jest --verbose",
-    "test-watch": "npm run test -- --watchAll",
-    "build": "./node_modules/.bin/tsc -p ./tsconfig.prod.json",
-    "prettier": "./node_modules/.bin/prettier --write \"**/*.ts\""
+    "test": "jest --verbose",
+    "test:clean": "jest --clearCache",
+    "test:watch": "npm test -- --watchAll",
+    "build:clean": "rm -rf ./dist",
+    "build:commonjs": "tsc -b ./tsconfig.commonjs.json",
+    "build:module": "tsc -b ./tsconfig.module.json",
+    "build": "npm run build:clean && npm run build:commonjs && npm run build:module",
+    "prettier": "prettier --write \"**/*.ts\""
   },
   "dependencies": {},
   "devDependencies": {
-    "@types/jest": "23.3.2",
-    "@types/node": "10.9.4",
+    "@types/jest": "23.3.9",
+    "@types/node": "10.12.9",
     "jest": "^23.6.0",
     "prettier": "^1.13.7",
     "ts-jest": "^23.1.4",
     "typescript": "^3.0.3"
-  },
-  "prettier": {
-    "semi": true,
-    "trailingComma": "all",
-    "singleQuote": true,
-    "printWidth": 120,
-    "tabWidth": 2,
-    "useTabs": false
-  },
-  "jest": {
-    "testMatch": [
-      "**/*.test.ts"
-    ],
-    "testEnvironment": "node",
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest"
-    },
-    "moduleFileExtensions": [
-      "ts",
-      "js",
-      "json",
-      "node"
-    ],
-    "globals": {
-      "ts-jest": {
-        "diagnostics": true
-      }
-    }
   }
 }
