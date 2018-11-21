@@ -3,6 +3,7 @@
   "compilerOptions": {
     "rootDir": "src",
     "moduleResolution": "node",
+    "module": "commonjs",
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "target": "es2017",

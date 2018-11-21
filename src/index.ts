@@ -2,38 +2,98 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { promisify } from 'util';
 
-export type ModuleMap<T, K extends string = string> = Record<K, T>;
+export type ModuleMap<T = any, K extends string = any> = Record<K, T>;
 
 export interface Config {
   directory: string;
-  exportName?: string;
-  include?: RegExp;
-  exclude?: RegExp;
+  exportName?: string | null;
+  include?: RegExp | null;
+  exclude?: RegExp | null;
   /** Either throw an error on invalid name and missing export or not */
-  strict?: boolean;
+  strict?: boolean | null;
 }
 
-const fsStat = promisify(fs.stat);
-const fsReaddir = promisify(fs.readdir);
-
-async function moduleLoader<T = any, K extends string = any, TModuleMap = ModuleMap<T, K>>(
-  directoryOrConfig: string | Config,
-): Promise<TModuleMap> {
+function parseConfig(directoryOrConfig: string | Config): Config & { exportName: NonNullable<Config['exportName']> } {
   let directory: Config['directory'];
-  let exportName: string = 'default';
-  let include: NonNullable<Config['include']> | null = null;
-  let exclude: NonNullable<Config['exclude']> | null = null;
-  let strict: NonNullable<Config['strict']> = true;
+  let exportName: Config['exportName'] = 'default';
+  let include: Config['include'] = null;
+  let exclude: Config['exclude'] = null;
+  let strict: Config['strict'] = true;
 
   if (typeof directoryOrConfig === 'string') {
     directory = directoryOrConfig;
   } else {
     directory = directoryOrConfig.directory;
-    exportName = typeof directoryOrConfig.exportName !== 'undefined' ? directoryOrConfig.exportName : exportName;
-    include = typeof directoryOrConfig.include !== 'undefined' ? directoryOrConfig.include : include;
-    exclude = typeof directoryOrConfig.exclude !== 'undefined' ? directoryOrConfig.exclude : exclude;
-    strict = typeof directoryOrConfig.strict !== 'undefined' ? directoryOrConfig.strict : strict;
+    exportName = directoryOrConfig.exportName != null ? directoryOrConfig.exportName : exportName;
+    include = directoryOrConfig.include != null ? directoryOrConfig.include : include;
+    exclude = directoryOrConfig.exclude != null ? directoryOrConfig.exclude : exclude;
+    strict = directoryOrConfig.strict != null ? directoryOrConfig.strict : strict;
   }
+
+  return {
+    directory,
+    exportName,
+    include,
+    exclude,
+    strict,
+  };
+}
+
+export function syncModuleLoader<T = any, K extends string = any, TModuleMap = ModuleMap<T, K>>(
+  directoryOrConfig: string | Config,
+): TModuleMap {
+  const { directory, exportName, include, exclude, strict } = parseConfig(directoryOrConfig);
+
+  const moduleMap: TModuleMap = Object.create(null);
+
+  let isDirectory: boolean;
+  try {
+    isDirectory = fs.statSync(directory).isDirectory();
+  } catch (err) {
+    isDirectory = false;
+  }
+
+  if (isDirectory) {
+    const files = fs.readdirSync(directory);
+    if (files.length > 0) {
+      files.map(file => {
+        const fileExtension = path.extname(file);
+        if (fileExtension && ['.js', '.jsx', '.ts', '.tsx', '.json'].includes(fileExtension)) {
+          const fileBaseName = path.basename(file, fileExtension);
+
+          if ((!include || include.test(fileBaseName)) && !(exclude && exclude.test(fileBaseName))) {
+            const module = require(path.join(directory, file));
+            if (typeof module[exportName] !== 'undefined') {
+              Object.assign(moduleMap, { [fileBaseName]: module[exportName] });
+            } else {
+              if (strict) {
+                throw new Error(
+                  `The module "${file}" does not have a ${
+                    exportName === 'default' ? 'default export' : `export named "${exportName}"`
+                  }.`,
+                );
+              }
+            }
+          } else {
+            if (strict) {
+              throw new Error(`The module "${file}" does not have a valid name.`);
+            }
+          }
+        }
+      });
+    }
+  }
+
+  return moduleMap;
+}
+
+const fsStat = promisify(fs.stat);
+const fsReaddir = promisify(fs.readdir);
+
+export async function asyncModuleLoader<T = any, K extends string = any, TModuleMap = ModuleMap<T, K>>(
+  directoryOrConfig: string | Config,
+): Promise<TModuleMap> {
+  const { directory, exportName, include, exclude, strict } = parseConfig(directoryOrConfig);
 
   const moduleMap: TModuleMap = Object.create(null);
 
@@ -80,4 +140,4 @@ async function moduleLoader<T = any, K extends string = any, TModuleMap = Module
   return moduleMap;
 }
 
-export default moduleLoader;
+export default asyncModuleLoader;

@@ -1,84 +1,105 @@
-import moduleLoader from '../';
+import each from 'jest-each';
+import { asyncModuleLoader, syncModuleLoader } from '../';
 
 describe('ModuleLoader', () => {
-  it('loads modules map from string', async () =>
-    expect(moduleLoader(`${__dirname}/modules`)).resolves.toEqual({
-      '0second': expect.anything(),
-      first: expect.anything(),
-      second: expect.anything(),
-    }));
-
-  it('loads modules map from object', async () =>
-    expect(moduleLoader({ directory: `${__dirname}/modules` })).resolves.toEqual({
-      '0second': expect.anything(),
-      first: expect.anything(),
-      second: expect.anything(),
-    }));
-
-  it('loads modules map from object, with include regexp, not strict', async () =>
-    expect(
-      moduleLoader({
+  each([
+    // loads modules map from string
+    [
+      `${__dirname}/modules`,
+      {
+        '0second': expect.anything(),
+        first: expect.anything(),
+        second: expect.anything(),
+      },
+    ],
+    // loads modules map from object
+    [
+      { directory: `${__dirname}/modules` },
+      {
+        '0second': expect.anything(),
+        first: expect.anything(),
+        second: expect.anything(),
+      },
+    ],
+    // loads modules map from object, with include regexp, not strict
+    [
+      {
         directory: `${__dirname}/modules`,
         include: /^[a-zA-Z][_a-zA-Z0-9]*$/,
         strict: false,
-      }),
-    ).resolves.toEqual({
-      first: expect.anything(),
-      second: expect.anything(),
-    }));
-
-  it('loads modules map from object, with exclude regexp, not strict', async () =>
-    expect(
-      moduleLoader({
+      },
+      {
+        first: expect.anything(),
+        second: expect.anything(),
+      },
+    ],
+    // loads modules map from object, with exclude regexp, not strict
+    [
+      {
         directory: `${__dirname}/modules`,
         exclude: /^second$/,
         strict: false,
-      }),
-    ).resolves.toEqual({
-      '0second': expect.anything(),
-      first: expect.anything(),
-    }));
-
-  it('loads modules map from object, with include regexp, strict', async () =>
-    expect(
-      moduleLoader({
-        directory: `${__dirname}/modules`,
-        include: /^[a-zA-Z][_a-zA-Z0-9]*$/,
-        strict: true,
-      }),
-    ).rejects.toMatchObject({ message: 'The module "0second.ts" does not have a valid name.' }));
-
-  it('loads modules without default export, not strict', async () =>
-    expect(
-      moduleLoader({
+      },
+      {
+        '0second': expect.anything(),
+        first: expect.anything(),
+      },
+    ],
+    // loads modules without default export, not strict
+    [
+      {
         directory: `${__dirname}/module-without-default-export`,
         strict: false,
-      }),
-    ).resolves.toEqual({}));
-
-  it('loads modules without default export, strict', async () =>
-    expect(
-      moduleLoader({
-        directory: `${__dirname}/module-without-default-export`,
-        strict: true,
-      }),
-    ).rejects.toMatchObject({ message: 'The module "first.ts" does not have a default export.' }));
-
-  it('loads modules from missing directory', async () =>
-    expect(
-      moduleLoader({
+      },
+      {},
+    ],
+    // loads modules from missing directory
+    [
+      {
         directory: `${__dirname}/missing_modules`,
-      }),
-    ).resolves.toEqual({}));
-
-  it('loads modules with named export, not strict', async () =>
-    expect(
-      moduleLoader({
+      },
+      {},
+    ],
+    // loads modules with named export, not strict
+    [
+      {
         directory: `${__dirname}/module-with-named-export`,
         exportName: 'test',
         strict: false,
-      }),
-    ).resolves.toEqual({
-      first: expect.anything(),
-    }));
+      },
+      {
+        first: expect.anything(),
+      },
+    ],
+  ]).test('loads modules', async (config, result, done) => {
+    await expect(asyncModuleLoader(config)).resolves.toEqual(result);
+    expect(syncModuleLoader(config)).toEqual(result);
+
+    done();
+  });
+
+  each([
+    // loads modules map from object, with include regexp, strict
+    [
+      {
+        directory: `${__dirname}/modules`,
+        include: /^[a-zA-Z][_a-zA-Z0-9]*$/,
+        strict: true,
+      },
+      'The module "0second.ts" does not have a valid name.',
+    ],
+    // loads modules without default export, strict
+    [
+      {
+        directory: `${__dirname}/module-without-default-export`,
+        strict: true,
+      },
+      'The module "first.ts" does not have a default export.',
+    ],
+  ]).test('fails', async (config, message, done) => {
+    await expect(asyncModuleLoader(config)).rejects.toMatchObject({ message });
+    expect(() => syncModuleLoader(config)).toThrowError(message);
+
+    done();
+  });
 });
