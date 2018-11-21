@@ -2,8 +2,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { promisify } from 'util';
 
-export type ModuleMap<T = any, K extends string = any> = Record<K, T>;
-
 export interface Config {
   directory: string;
   exportName?: string | null;
@@ -39,12 +37,10 @@ function parseConfig(directoryOrConfig: string | Config): Config & { exportName:
   };
 }
 
-export function syncModuleLoader<T = any, K extends string = any, TModuleMap = ModuleMap<T, K>>(
-  directoryOrConfig: string | Config,
-): TModuleMap {
-  const { directory, exportName, include, exclude, strict } = parseConfig(directoryOrConfig);
+export function loadModuleMapSync<T = any>(directoryOrConfig: string | Config): Map<string, T> {
+  const moduleMap = new Map<string, T>();
 
-  const moduleMap: TModuleMap = Object.create(null);
+  const { directory, exportName, include, exclude, strict } = parseConfig(directoryOrConfig);
 
   let isDirectory: boolean;
   try {
@@ -64,7 +60,7 @@ export function syncModuleLoader<T = any, K extends string = any, TModuleMap = M
           if ((!include || include.test(fileBaseName)) && !(exclude && exclude.test(fileBaseName))) {
             const module = require(path.join(directory, file));
             if (typeof module[exportName] !== 'undefined') {
-              Object.assign(moduleMap, { [fileBaseName]: module[exportName] });
+              moduleMap.set(fileBaseName, module[exportName]);
             } else {
               if (strict) {
                 throw new Error(
@@ -90,12 +86,10 @@ export function syncModuleLoader<T = any, K extends string = any, TModuleMap = M
 const fsStat = promisify(fs.stat);
 const fsReaddir = promisify(fs.readdir);
 
-export async function asyncModuleLoader<T = any, K extends string = any, TModuleMap = ModuleMap<T, K>>(
-  directoryOrConfig: string | Config,
-): Promise<TModuleMap> {
-  const { directory, exportName, include, exclude, strict } = parseConfig(directoryOrConfig);
+export async function loadModuleMap<T = any>(directoryOrConfig: string | Config): Promise<Map<string, T>> {
+  const moduleMap = new Map<string, T>();
 
-  const moduleMap: TModuleMap = Object.create(null);
+  const { directory, exportName, include, exclude, strict } = parseConfig(directoryOrConfig);
 
   let isDirectory: boolean;
   try {
@@ -116,7 +110,7 @@ export async function asyncModuleLoader<T = any, K extends string = any, TModule
             if ((!include || include.test(fileBaseName)) && !(exclude && exclude.test(fileBaseName))) {
               const module = await import(path.join(directory, file));
               if (typeof module[exportName] !== 'undefined') {
-                Object.assign(moduleMap, { [fileBaseName]: module[exportName] });
+                moduleMap.set(fileBaseName, module[exportName]);
               } else {
                 if (strict) {
                   throw new Error(
@@ -140,4 +134,4 @@ export async function asyncModuleLoader<T = any, K extends string = any, TModule
   return moduleMap;
 }
 
-export default asyncModuleLoader;
+export default loadModuleMap;
