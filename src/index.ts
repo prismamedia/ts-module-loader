@@ -37,9 +37,10 @@ function parseConfig(directoryOrConfig: string | Config): Config & { exportName:
   };
 }
 
-export function loadModuleMapSync<T = any>(directoryOrConfig: string | Config): Map<string, T> {
-  const moduleMap = new Map<string, T>();
-
+export function loadModuleMapSync<T = any>(
+  directoryOrConfig: string | Config,
+  moduleMap = new Map<string, T>(),
+): Map<string, T> {
   const { directory, exportName, include, exclude, strict } = parseConfig(directoryOrConfig);
 
   let isDirectory: boolean;
@@ -86,9 +87,10 @@ export function loadModuleMapSync<T = any>(directoryOrConfig: string | Config): 
 const fsStat = promisify(fs.stat);
 const fsReaddir = promisify(fs.readdir);
 
-export async function loadModuleMap<T = any>(directoryOrConfig: string | Config): Promise<Map<string, T>> {
-  const moduleMap = new Map<string, T>();
-
+export async function loadModuleMap<T = any>(
+  directoryOrConfig: string | Config,
+  moduleMap = new Map<string, T>(),
+): Promise<Map<string, T>> {
   const { directory, exportName, include, exclude, strict } = parseConfig(directoryOrConfig);
 
   let isDirectory: boolean;
