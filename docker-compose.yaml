@@ -2,7 +2,7 @@ version: '3'
 
 services:
   lib:
-    image: node:8-alpine
+    image: node:10-alpine
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app:cached
