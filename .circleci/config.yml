@@ -1,0 +1,80 @@
+version: 2.1
+
+defaults: &defaults
+  docker:
+    - image: circleci/node:10
+
+commands:
+  vendor:
+    description: 'Install vendors'
+    steps:
+      - restore_cache:
+          keys:
+            - vendor-{{ checksum "package.json" }}
+      - run: yarn --no-progress
+      - save_cache:
+          paths:
+            - node_modules
+          key: vendor-{{ checksum "package.json" }}
+
+jobs:
+  test-node-8:
+    <<: *defaults
+    docker:
+      - image: circleci/node:8
+    steps:
+      - checkout
+      - vendor
+      - run: yarn run test
+
+  test:
+    <<: *defaults
+    steps:
+      - checkout
+      - vendor
+      - run: yarn run test
+
+  build:
+    <<: *defaults
+    steps:
+      - checkout
+      - vendor
+      - run: yarn run build
+      - persist_to_workspace:
+          root: .
+          paths: dist
+
+  publish:
+    <<: *defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run: echo "//registry.npmjs.org/:_authToken=${NPM_REGISTRY_AUTH_TOKEN}" > .npmrc
+      - run: ls -al .
+      - run: npm version --no-git-tag-version ${CIRCLE_TAG}
+      - run: npm publish
+
+workflows:
+  version: 2
+  test-build-and-publish:
+    jobs:
+      - test-node-8
+      - test:
+          filters:
+            tags:
+              only: /.*/
+      - build:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /.*/
+      - publish:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/

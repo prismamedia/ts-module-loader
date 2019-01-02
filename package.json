@@ -5,7 +5,7 @@
   "author": "Yvann Boucher <yvann.boucher@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "https://gitlab.com/prismamediadigital/one/ts-module-loader"
+    "url": "https://github.com/prismamedia/ts-module-loader"
   },
   "main": "dist/commonjs/index.js",
   "module": "dist/module/index.js",
