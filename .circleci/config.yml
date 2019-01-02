@@ -51,7 +51,6 @@ jobs:
       - attach_workspace:
           at: .
       - run: echo "//registry.npmjs.org/:_authToken=${NPM_REGISTRY_AUTH_TOKEN}" > .npmrc
-      - run: ls -al .
       - run: npm version --no-git-tag-version ${CIRCLE_TAG}
       - run: npm publish
 
