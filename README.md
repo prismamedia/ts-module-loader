@@ -13,7 +13,7 @@ src/
     └── Image.ts
 ```
 
-The basic idea is to import each module one-by-one. Then list the modules one-by-one to create the map. But what happens when a new module is added to the directory? It must be added twice in the code. That is error prone and a potential source of headache.
+The basic idea is to import each module one-by-one. Then list the modules one-by-one to create the map. But what appends when a new module is added to the directory? It must be added twice in the code. That is error prone and a potential source of headache.
 
 ```js
 // Don't do that
