@@ -13,7 +13,7 @@ src/
     └── Image.ts
 ```
 
-The basic idea is to import each module one-by-one. Then list the modules one-by-one to create the map. But what appends when a new module is added to the directory? It must be added twice in the code. That is error prone and a potential source of headache.
+The basic idea is to import each module one-by-one. Then list the modules one-by-one to create the map. But what happens when a new module is added to the directory? It must be added twice in the code. That is error prone and a potential source of headache.
 
 ```js
 // Don't do that
@@ -37,13 +37,19 @@ import loadModuleMap from '@prismamedia/ts-module-loader';
 
 # [...]
 
+# The simplest call, the result will be a "Map<string, any>"
 const moduleMap = await loadModuleMap(`${__dirname}/modules`);
 
+# A call with params
 const moduleMap = await loadModuleMap({
   directory: `${__dirname}/modules`,
   include: /^[_A-Za-z][_0-9A-Za-z]*$/,
   strict: true
 });
+
+# A call with a known module type/interface, the result will be a "Map<string, ModuleInterface>"
+interface ModuleInterface {}
+const moduleMap = await loadModuleMap<ModuleInterface>(`${__dirname}/modules`);
 ```
 
 ## Sync
