@@ -2,6 +2,33 @@
 
 [![npm version](https://badge.fury.io/js/%40prismamedia%2Fts-module-loader.svg)](https://badge.fury.io/js/%40prismamedia%2Fts-module-loader) [![CircleCI](https://circleci.com/gh/prismamedia/ts-module-loader/tree/master.svg?style=svg)](https://circleci.com/gh/prismamedia/ts-module-loader/tree/master)
 
+How to load every single modules from a directory?
+
+```
+src/
+├── index.ts
+└── modules/
+    ├── Article.ts
+    ├── Category.ts
+    └── Image.ts
+```
+
+The basic idea is to import each module one-by-one. Then list the modules one-by-one to create the map. But what appends when a new module is added to the directory? It must be added twice in the code. That is error prone and a potential source of headache.
+
+```js
+// Don't do that
+
+import Article from 'modules/Article';
+import Category from 'modules/Category';
+import Image from 'modules/Image';
+
+const moduleMap = {
+  Article: Article,
+  Category: Category,
+  Image: Image,
+};
+```
+
 ## Async
 
 ```js
