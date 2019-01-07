@@ -29,13 +29,16 @@ const moduleMap = {
 };
 ```
 
+# Usage
+
+```
+npm install --save @prismamedia/ts-module-loader
+```
+
 ## Async
 
 ```js
 import loadModuleMap from '@prismamedia/ts-module-loader';
-# or import { loadModuleMap } from '@prismamedia/ts-module-loader';
-
-# [...]
 
 const moduleMap = await loadModuleMap(`${__dirname}/modules`);
 
@@ -51,8 +54,6 @@ const moduleMap = await loadModuleMap({
 ```js
 import { loadModuleMapSync } from '@prismamedia/ts-module-loader';
 
-# [...]
-
 const moduleMap = loadModuleMapSync(`${__dirname}/modules`);
 
 const moduleMap = loadModuleMapSync({
@@ -61,3 +62,7 @@ const moduleMap = loadModuleMapSync({
   strict: true
 });
 ```
+
+# Support & Contributions
+
+This package is provided as this by developers at Prisma Media, under license MIT. Issues and Pull Requests are handled on friday by maintainers.
