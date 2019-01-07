@@ -1,6 +1,6 @@
 {
   "name": "@prismamedia/ts-module-loader",
-  "licence": "MIT",
+  "license": "MIT",
   "private": false,
   "author": "Yvann Boucher <yvann.boucher@gmail.com>",
   "repository": {
