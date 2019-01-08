@@ -2,7 +2,9 @@
   "name": "@prismamedia/ts-module-loader",
   "license": "MIT",
   "private": false,
-  "author": "Yvann Boucher <yvann.boucher@gmail.com>",
+  "contributors": [
+    "Yvann Boucher <yvann.boucher@gmail.com>"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/prismamedia/ts-module-loader"
