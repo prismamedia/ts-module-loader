@@ -37,13 +37,19 @@ import loadModuleMap from '@prismamedia/ts-module-loader';
 
 # [...]
 
+# The simplest call, the result will be a "Map<string, any>"
 const moduleMap = await loadModuleMap(`${__dirname}/modules`);
 
+# A call with params
 const moduleMap = await loadModuleMap({
   directory: `${__dirname}/modules`,
   include: /^[_A-Za-z][_0-9A-Za-z]*$/,
   strict: true
 });
+
+# A call with a known module type/interface, the result will be a "Map<string, ModuleInterface>"
+interface ModuleInterface {}
+const moduleMap = await loadModuleMap<ModuleInterface>(`${__dirname}/modules`);
 ```
 
 ## Sync
