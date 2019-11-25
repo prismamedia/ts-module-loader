@@ -2,33 +2,30 @@
   "name": "@prismamedia/ts-module-loader",
   "license": "MIT",
   "private": false,
-  "author": "Yvann Boucher <yvann.boucher@gmail.com>",
+  "contributors": [
+    "Yvann Boucher <yvann.boucher@gmail.com>"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/prismamedia/ts-module-loader"
   },
-  "main": "dist/commonjs/index.js",
-  "module": "dist/module/index.js",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
   "typings": "dist/types/index.d.ts",
   "scripts": {
-    "test": "jest --maxWorkers=1 --verbose",
-    "test:clean": "jest --clearCache",
+    "build": "tsc --build tsconfig.json tsconfig.esm.json",
+    "build:watch": "yarn run build --watch",
+    "test": "NODE_ENV=test jest --detectOpenHandles --forceExit --verbose --passWithNoTests",
     "test:watch": "yarn run test --watchAll",
-    "build:clean": "rm -rf ./dist",
-    "build:commonjs": "tsc -b ./tsconfig.commonjs.json",
-    "build:module": "tsc -b ./tsconfig.module.json",
-    "build": "yarn run build:clean && yarn run build:commonjs && yarn run build:module",
     "prettier": "prettier --write \"**/*.ts\""
   },
   "dependencies": {},
   "devDependencies": {
-    "@types/jest": "23.3.10",
-    "@types/jest-each": "^0.3.3",
-    "@types/node": "10.12.18",
-    "jest": "^23.6.0",
-    "jest-each": "^23.6.0",
-    "prettier": "^1.13.7",
-    "ts-jest": "^23.1.4",
-    "typescript": "^3.0.3"
+    "@types/jest": "^24.0.23",
+    "@types/node": "^12.12.11",
+    "jest": "^24.9.0",
+    "prettier": "^1.19.1",
+    "ts-jest": "^24.1.0",
+    "typescript": "^3.7.2"
   }
 }

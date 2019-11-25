@@ -1,8 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { promisify } from 'util';
 
-export interface Config {
+export type Config = {
   directory: string;
   exportName?: string | null;
   include?: RegExp | null;
@@ -10,6 +9,8 @@ export interface Config {
   /** Either throw an error on invalid name and missing export or not */
   strict?: boolean | null;
 }
+
+export type ModuleMap<T = any> = Map<string, T>;
 
 function parseConfig(directoryOrConfig: string | Config): Config & { exportName: NonNullable<Config['exportName']> } {
   let directory: Config['directory'];
@@ -39,8 +40,8 @@ function parseConfig(directoryOrConfig: string | Config): Config & { exportName:
 
 export function loadModuleMapSync<T = any>(
   directoryOrConfig: string | Config,
-  moduleMap = new Map<string, T>(),
-): Map<string, T> {
+  moduleMap: ModuleMap<T> = new Map(),
+): ModuleMap<T> {
   const { directory, exportName, include, exclude, strict } = parseConfig(directoryOrConfig);
 
   let isDirectory: boolean;
@@ -84,24 +85,21 @@ export function loadModuleMapSync<T = any>(
   return moduleMap;
 }
 
-const fsStat = promisify(fs.stat);
-const fsReaddir = promisify(fs.readdir);
-
 export async function loadModuleMap<T = any>(
   directoryOrConfig: string | Config,
-  moduleMap = new Map<string, T>(),
-): Promise<Map<string, T>> {
+  moduleMap: ModuleMap<T> = new Map(),
+): Promise<ModuleMap<T>> {
   const { directory, exportName, include, exclude, strict } = parseConfig(directoryOrConfig);
 
   let isDirectory: boolean;
   try {
-    isDirectory = (await fsStat(directory)).isDirectory();
+    isDirectory = (await fs.promises.stat(directory)).isDirectory();
   } catch (err) {
     isDirectory = false;
   }
 
   if (isDirectory) {
-    const files = await fsReaddir(directory);
+    const files = await fs.promises.readdir(directory);
     if (files.length > 0) {
       await Promise.all(
         files.map(async file => {

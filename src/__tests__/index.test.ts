@@ -1,8 +1,7 @@
-import each from 'jest-each';
 import { loadModuleMap, loadModuleMapSync } from '../';
 
 describe('ModuleLoader', () => {
-  each([
+  it.each(<any[]>[
     // loads modules map from string
     [
       `${__dirname}/modules`,
@@ -71,7 +70,7 @@ describe('ModuleLoader', () => {
         first: expect.anything(),
       },
     ],
-  ]).test('loads modules', async (config, result, done) => {
+  ])('loads modules', async (config, result, done) => {
     // Test Async
     await expect(loadModuleMap(config)).resolves.toEqual(new Map(Object.entries(result)));
 
@@ -81,7 +80,7 @@ describe('ModuleLoader', () => {
     done();
   });
 
-  each([
+  it.each(<any[]>[
     // loads modules map from object, with include regexp, strict
     [
       {
@@ -99,7 +98,7 @@ describe('ModuleLoader', () => {
       },
       'The module "first.ts" does not have a default export.',
     ],
-  ]).test('fails', async (config, message, done) => {
+  ])('fails', async (config, message, done) => {
     // Test Async
     await expect(loadModuleMap(config)).rejects.toMatchObject({ message });
 

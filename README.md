@@ -1,6 +1,6 @@
 **Typescript module loader**
 
-[![npm version](https://badge.fury.io/js/%40prismamedia%2Fts-module-loader.svg)](https://badge.fury.io/js/%40prismamedia%2Fts-module-loader) [![CircleCI](https://circleci.com/gh/prismamedia/ts-module-loader/tree/master.svg?style=svg)](https://circleci.com/gh/prismamedia/ts-module-loader/tree/master)
+[![npm version](https://badge.fury.io/js/%40prismamedia%2Fts-module-loader.svg)](https://badge.fury.io/js/%40prismamedia%2Fts-module-loader) [![github actions status](https://github.com/prismamedia/ts-module-loader/workflows/CI/badge.svg)](https://github.com/prismamedia/ts-module-loader/actions) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
 How to load every single modules from a directory?
 
