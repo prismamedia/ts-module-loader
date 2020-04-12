@@ -8,11 +8,13 @@ export type Config = {
   exclude?: RegExp | null;
   /** Either throw an error on invalid name and missing export or not */
   strict?: boolean | null;
-}
+};
 
 export type ModuleMap<T = any> = Map<string, T>;
 
-function parseConfig(directoryOrConfig: string | Config): Config & { exportName: NonNullable<Config['exportName']> } {
+function parseConfig(
+  directoryOrConfig: string | Config,
+): Config & { exportName: NonNullable<Config['exportName']> } {
   let directory: Config['directory'];
   let exportName: Config['exportName'] = 'default';
   let include: Config['include'] = null;
@@ -23,10 +25,16 @@ function parseConfig(directoryOrConfig: string | Config): Config & { exportName:
     directory = directoryOrConfig;
   } else {
     directory = directoryOrConfig.directory;
-    exportName = directoryOrConfig.exportName != null ? directoryOrConfig.exportName : exportName;
-    include = directoryOrConfig.include != null ? directoryOrConfig.include : include;
-    exclude = directoryOrConfig.exclude != null ? directoryOrConfig.exclude : exclude;
-    strict = directoryOrConfig.strict != null ? directoryOrConfig.strict : strict;
+    exportName =
+      directoryOrConfig.exportName != null
+        ? directoryOrConfig.exportName
+        : exportName;
+    include =
+      directoryOrConfig.include != null ? directoryOrConfig.include : include;
+    exclude =
+      directoryOrConfig.exclude != null ? directoryOrConfig.exclude : exclude;
+    strict =
+      directoryOrConfig.strict != null ? directoryOrConfig.strict : strict;
   }
 
   return {
@@ -42,7 +50,9 @@ export function loadModuleMapSync<T = any>(
   directoryOrConfig: string | Config,
   moduleMap: ModuleMap<T> = new Map(),
 ): ModuleMap<T> {
-  const { directory, exportName, include, exclude, strict } = parseConfig(directoryOrConfig);
+  const { directory, exportName, include, exclude, strict } = parseConfig(
+    directoryOrConfig,
+  );
 
   let isDirectory: boolean;
   try {
@@ -54,12 +64,18 @@ export function loadModuleMapSync<T = any>(
   if (isDirectory) {
     const files = fs.readdirSync(directory);
     if (files.length > 0) {
-      files.map(file => {
+      files.map((file) => {
         const fileExtension = path.extname(file);
-        if (fileExtension && ['.js', '.jsx', '.ts', '.tsx', '.json'].includes(fileExtension)) {
+        if (
+          fileExtension &&
+          ['.js', '.jsx', '.ts', '.tsx', '.json'].includes(fileExtension)
+        ) {
           const fileBaseName = path.basename(file, fileExtension);
 
-          if ((!include || include.test(fileBaseName)) && !(exclude && exclude.test(fileBaseName))) {
+          if (
+            (!include || include.test(fileBaseName)) &&
+            !(exclude && exclude.test(fileBaseName))
+          ) {
             const module = require(path.join(directory, file));
             if (typeof module[exportName] !== 'undefined') {
               moduleMap.set(fileBaseName, module[exportName]);
@@ -67,14 +83,18 @@ export function loadModuleMapSync<T = any>(
               if (strict) {
                 throw new Error(
                   `The module "${file}" does not have a ${
-                    exportName === 'default' ? 'default export' : `export named "${exportName}"`
+                    exportName === 'default'
+                      ? 'default export'
+                      : `export named "${exportName}"`
                   }.`,
                 );
               }
             }
           } else {
             if (strict) {
-              throw new Error(`The module "${file}" does not have a valid name.`);
+              throw new Error(
+                `The module "${file}" does not have a valid name.`,
+              );
             }
           }
         }
@@ -89,7 +109,9 @@ export async function loadModuleMap<T = any>(
   directoryOrConfig: string | Config,
   moduleMap: ModuleMap<T> = new Map(),
 ): Promise<ModuleMap<T>> {
-  const { directory, exportName, include, exclude, strict } = parseConfig(directoryOrConfig);
+  const { directory, exportName, include, exclude, strict } = parseConfig(
+    directoryOrConfig,
+  );
 
   let isDirectory: boolean;
   try {
@@ -102,12 +124,18 @@ export async function loadModuleMap<T = any>(
     const files = await fs.promises.readdir(directory);
     if (files.length > 0) {
       await Promise.all(
-        files.map(async file => {
+        files.map(async (file) => {
           const fileExtension = path.extname(file);
-          if (fileExtension && ['.js', '.jsx', '.ts', '.tsx', '.json'].includes(fileExtension)) {
+          if (
+            fileExtension &&
+            ['.js', '.jsx', '.ts', '.tsx', '.json'].includes(fileExtension)
+          ) {
             const fileBaseName = path.basename(file, fileExtension);
 
-            if ((!include || include.test(fileBaseName)) && !(exclude && exclude.test(fileBaseName))) {
+            if (
+              (!include || include.test(fileBaseName)) &&
+              !(exclude && exclude.test(fileBaseName))
+            ) {
               const module = await import(path.join(directory, file));
               if (typeof module[exportName] !== 'undefined') {
                 moduleMap.set(fileBaseName, module[exportName]);
@@ -115,14 +143,18 @@ export async function loadModuleMap<T = any>(
                 if (strict) {
                   throw new Error(
                     `The module "${file}" does not have a ${
-                      exportName === 'default' ? 'default export' : `export named "${exportName}"`
+                      exportName === 'default'
+                        ? 'default export'
+                        : `export named "${exportName}"`
                     }.`,
                   );
                 }
               }
             } else {
               if (strict) {
-                throw new Error(`The module "${file}" does not have a valid name.`);
+                throw new Error(
+                  `The module "${file}" does not have a valid name.`,
+                );
               }
             }
           }

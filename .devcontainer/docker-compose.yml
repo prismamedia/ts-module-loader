@@ -1,0 +1,17 @@
+version: '3.7'
+
+services:
+  lib:
+    image: node:12
+    command: /bin/sh -c "while sleep 1000; do :; done"
+    environment:
+      YARN_CACHE_FOLDER: /var/cache/yarn
+    working_dir: /workspace
+    volumes:
+      - ..:/workspace:delegated
+      - ~/.bash_history:/root/.bash_history
+      - yarn_cache:/var/cache/yarn
+    restart: 'no'
+
+volumes:
+  yarn_cache: ~

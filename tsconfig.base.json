@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "incremental": true,
+    "sourceMap": true,
+    "strict": true,
+    "noImplicitThis": false,
+    "moduleResolution": "Node",
+    "lib": ["ES2019", "ES2020.String", "ESNext.BigInt"],
+    "target": "ES2019",
+    "rootDir": "src"
+  }
+}

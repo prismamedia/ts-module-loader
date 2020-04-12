@@ -1,11 +1,7 @@
 {
-  "extends": "./tsconfig",
+  "extends": "./tsconfig.base",
   "compilerOptions": {
-    "composite": false,
-    "declaration": false,
-    "declarationMap": false,
-    "declarationDir": null,
-    "module": "esnext",
+    "module": "ESNext",
     "outDir": "dist/esm"
   }
 }

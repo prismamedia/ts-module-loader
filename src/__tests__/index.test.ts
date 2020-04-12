@@ -72,7 +72,9 @@ describe('ModuleLoader', () => {
     ],
   ])('loads modules', async (config, result, done) => {
     // Test Async
-    await expect(loadModuleMap(config)).resolves.toEqual(new Map(Object.entries(result)));
+    await expect(loadModuleMap(config)).resolves.toEqual(
+      new Map(Object.entries(result)),
+    );
 
     // Test Sync
     expect(loadModuleMapSync(config)).toEqual(new Map(Object.entries(result)));

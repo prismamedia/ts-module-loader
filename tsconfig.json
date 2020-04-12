@@ -1,20 +1,10 @@
 {
+  "extends": "./tsconfig.base",
   "compilerOptions": {
-    "composite": true,
+    "module": "CommonJS",
+    "outDir": "dist/cjs",
     "declaration": true,
     "declarationMap": true,
-    "esModuleInterop": true,
-    "experimentalDecorators": true,
-    "incremental": true,
-    "lib": ["es2018"],
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "noImplicitAny": true,
-    "sourceMap": true,
-    "strict": true,
-    "target": "es2018",
-    "declarationDir": "dist/types",
-    "outDir": "dist/cjs",
-    "rootDir": "src"
+    "declarationDir": "dist/types"
   }
 }
